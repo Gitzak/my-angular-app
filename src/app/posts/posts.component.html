@@ -1,0 +1,134 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="jumbotron m-5">
+                <h1 class="display-4">The list of Posts</h1>
+                <p><span class="font-weight-bold">JSONPlaceholder</span> is a free online REST API that you can use
+                    whenever you need some fake data.
+                    It's great for tutorials, testing new libraries, sharing code examples, ...
+                </p>
+                <p class="lead text-right">
+                    <button (click)="showForm = !showForm" type="button" class="btn btn-primary btn-lg"><i
+                            class="fa fa-plus"></i></button>
+                </p>
+                <form #f="ngForm" *ngIf="showForm">
+                    <div class="form-row justify-content-center d-flex">
+                        <div class="form-group col-md-6">
+                            <label for="title">Titre</label>
+                            <input name="title" pattern="[a-zA-Z ]*" autocomplete="off" required minlength="3"
+                                maxlength="10" #myTitle="ngModel" [(ngModel)]="myPost.title" id="title"
+                                placeholder="Title" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div *ngIf="myTitle.invalid && myTitle.touched" class="alert alert-danger col-md-6 offset-3"
+                        role="alert">
+                        <div *ngIf="myTitle.errors.required">This field is required !!</div>
+                        <div *ngIf="myTitle.errors.minlength">This field should be great than
+                            {{ myTitle.errors.minlength.actualLength }} / {{ myTitle.errors.minlength.requiredLength }}
+                            caracters !!</div>
+                        <div *ngIf="myTitle.errors.pattern">This field is not respect the pattern !!</div>
+                    </div>
+                    <div class="form-row justify-content-center d-flex">
+                        <div class="form-group col-md-6">
+                            <label for="body">Content</label>
+                            <textarea name="body" required minlength="3" #myBody="ngModel" [(ngModel)]="myPost.body"
+                                placeholder="Body" id="body" rows="4" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div *ngIf="myBody.invalid && myBody.touched" class="alert alert-danger col-md-6 offset-3"
+                        role="alert">
+                        <div *ngIf="myBody.errors.required">This field is required !!</div>
+                        <div *ngIf="myBody.errors.minlength">This field should be great than 3 caracters !!</div>
+                    </div>
+                    <div class="form-row justify-content-center d-flex">
+                        <div class="form-group col-md-6">
+                            <button (click)="saddPost(f)" *ngIf="!editable && f.valid" [disabled]="f.invalid"
+                                class="btn btn-primary btn-lg btn-block">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+
+                            <button *ngIf="editable" class="btn btn-warning btn-block" (click)="updatePost()"><i
+                                    class="fa fa-refresh"></i>
+                                Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div *ngIf="posts.length == 0" class="alert alert-warning text-center" role="alert">
+                No article
+            </div>
+            <div *ngIf="posts.length" class="alert alert-primary text-center" role="alert">
+                {{ posts.length }} Posts
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-right">
+        <div class="col-12">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button (click)="showGrid = true" type="button" class="btn btn-secondary btn-lg"><i
+                        class="fa fa-th-large"></i></button>
+                <button (click)="showGrid = false" type="button" class="btn btn-secondary btn-lg"><i
+                        class="fa fa-th-list"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="showGrid" class="row" justify-content-center>
+        <div class="col-md-4 col-sm-6 my-3 card-group" *ngFor="let post of posts; index as i">
+            <div class="card">
+                <img class="card-img-top"
+                    src="https://blog.jscrambler.com/content/images/2018/01/protecting-angular-js-app.png"
+                    alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.body }}</p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-info btn-sm mr-2" [routerLink]="['/comments/',post.id]"><i
+                            class="fa fa-eye"></i></a>
+                    <button class="btn btn-dark btn-sm mr-2" (click)="editPost(post)"><i
+                            class="fa fa-pencil"></i></button>
+                    <button class="btn btn-danger btn-sm" (click)="removePost(post.id, i)"><i
+                            class="fa fa-times"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <table *ngIf="!showGrid" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="posts.length">
+                    <tr *ngFor="let post of posts; index as i">
+                        <td>{{ post.title }}</td>
+                        <td>{{ post.body }}</td>
+                        <td class="text-right" nowrap>
+                            <a class="btn btn-info btn-sm mr-2" [routerLink]="['/comments/',post.id]"><i
+                                    class="fa fa-eye"></i></a>
+                            <button class="btn btn-dark btn-sm mr-2" (click)="editPost(post)"><i
+                                    class="fa fa-pencil"></i></button>
+                            <button class="btn btn-danger btn-sm" (click)="removePost(post.id, i)"><i
+                                    class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div *ngIf="posts.length == 0" class="alert alert-warning w-100 text-center" role="alert">
+                Sorry nothing finds
+            </div>
+        </div>
+    </div>
+</div>
